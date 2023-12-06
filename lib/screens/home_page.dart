@@ -1,6 +1,6 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:gap/gap.dart';
 import 'package:location/location.dart';
 import 'package:stemm_cloudwoork_assignment/api/weather_api.dart';
 
@@ -22,6 +22,11 @@ class _MyHomePageState extends State<MyHomePage> {
   List myPlacelist = [];
   bool isCurrentLocation = true;
   final TextEditingController placeController = TextEditingController();
+
+  Future<bool> checkConnectivity() async {
+    ConnectivityResult result = await Connectivity().checkConnectivity();
+    return (result != ConnectivityResult.none);
+  }
 
   getCurrentLocation() async {
     Location location = Location();
@@ -67,85 +72,101 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    getCurrentLocation();
+    checkConnectivity().then((isConnected) {
+      if (isConnected) {
+        getCurrentLocation();
+      } else {
+        Fluttertoast.showToast(msg: "No Internet Connection");
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text("Weather Details"),
-        ),
-        body: isLoading
-            ? const Center(
-                child: CircularProgressIndicator(),
-              )
-            : Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Column(
-                  children: [
-                    SwitchListTile(
-                        title: const Text("Current Location"),
-                        value: isCurrentLocation,
-                        onChanged: (val) {
-                          setState(() {
-                            isCurrentLocation = val;
-                          });
-                          getCurrentLocation();
-                        }),
-                    Text(
-                      "Location Name: ${(isCurrentLocation ? "Current Location" : myLongLatData["name"])}",
-                      style: const TextStyle(fontSize: 20),
-                    ),
-                    Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          "Today Weather \n Min : ${myData["daily"]["temperature_2m_min"][0]} °C \n Max :${myData["daily"]["temperature_2m_max"][0]} °C",
-                          style: const TextStyle(fontSize: 20),
-                        ),
-                      ),
-                    ),
-                    DataTable(
-                        // datatable widget
-                        columns: const [
-                          // column to set the name
-                          DataColumn(
-                            label: Text('Date'),
-                          ),
-                          DataColumn(
-                            label: Text('Temp(Min)'),
-                          ),
-                          DataColumn(
-                            label: Text('Temp(Max)'),
-                          ),
-                        ],
-                        rows: List.generate(
-                            myData["daily"]["time"].length,
-                            (index) => DataRow(cells: [
-                                  DataCell(Text(myData["daily"]["time"][index]
-                                      .toString())),
-                                  DataCell(Text(
-                                      "${myData["daily"]["temperature_2m_min"][index]} °C")),
-                                  DataCell(Text(
-                                      "${myData["daily"]["temperature_2m_max"][index]} °C")),
-                                ])).toList())
-                  ],
-                ),
-              ),
-        floatingActionButton: FloatingActionButton.extended(
-          onPressed: () async {
-            showModalBottomSheet(
-                context: context,
-                builder: (context) {
-                  return Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: SingleChildScrollView(
+      appBar: AppBar(
+        title: const Text("Weather Details"),
+      ),
+      body: FutureBuilder(
+        future: Connectivity().checkConnectivity(),
+        builder:
+            (BuildContext context, AsyncSnapshot<ConnectivityResult> snapshot) {
+          if (snapshot.data == null ||
+              snapshot.data == ConnectivityResult.none) {
+            return const Center(
+              child: Text("No Internet Connection"),
+            );
+          } else {
+            return isLoading
+                ? const Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : SingleChildScrollView(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: Column(
                         children: [
+                          SwitchListTile(
+                              title: const Text("Current Location"),
+                              value: isCurrentLocation,
+                              onChanged: (val) {
+                                setState(() {
+                                  isCurrentLocation = val;
+                                });
+                                getCurrentLocation();
+                              }),
+                          Text.rich(
+                            TextSpan(text: "Location Name: ", children: [
+                              TextSpan(
+                                  text: (isCurrentLocation
+                                      ? "Current Location"
+                                      : myLongLatData["name"]),
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.w300))
+                            ]),
+                            style: const TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.bold),
+                          ),
+                          Card(
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                "Today Weather \n Min : ${myData["daily"]["temperature_2m_min"][0]} °C \n Max :${myData["daily"]["temperature_2m_max"][0]} °C",
+                                style: const TextStyle(fontSize: 20),
+                              ),
+                            ),
+                          ),
+                          Card(
+                            child: DataTable(
+                                // datatable widget
+                                columns: const [
+                                  // column to set the name
+                                  DataColumn(
+                                    label: Text('Date'),
+                                  ),
+                                  DataColumn(
+                                    label: Text('Temp(Min)'),
+                                  ),
+                                  DataColumn(
+                                    label: Text('Temp(Max)'),
+                                  ),
+                                ],
+                                rows: List.generate(
+                                    myData["daily"]["time"].length,
+                                    (index) => DataRow(cells: [
+                                          DataCell(Text(myData["daily"]["time"]
+                                                  [index]
+                                              .toString())),
+                                          DataCell(Text(
+                                              "${myData["daily"]["temperature_2m_min"][index]} °C")),
+                                          DataCell(Text(
+                                              "${myData["daily"]["temperature_2m_max"][index]} °C")),
+                                        ])).toList()),
+                          ),
                           const Text(
-                            "Get Search By Name",
-                            style: TextStyle(fontSize: 20),
+                            "Get Search Place By Name",
+                            style: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.w800),
                           ),
                           TextFormField(
                               controller: placeController,
@@ -172,11 +193,11 @@ class _MyHomePageState extends State<MyHomePage> {
                           ),
                           ...myPlacelist.map((e) {
                             return Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(e["name"]),
-                                const Gap(5),
                                 ElevatedButton(
-                                  child: const Text("Get Details"),
+                                  child: const Text("Get Weather Details"),
                                   onPressed: () {
                                     myLongLatData = e;
                                     isCurrentLocation = false;
@@ -185,7 +206,6 @@ class _MyHomePageState extends State<MyHomePage> {
                                         latitude: e["latitude"],
                                         longtitude: e["longitude"]);
                                     setState(() {});
-                                    Navigator.of(context).pop();
                                   },
                                 )
                               ],
@@ -195,17 +215,9 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                     ),
                   );
-                });
-            // Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-            //   return const CitySelectionScreen();
-            // })).then((value) {
-            //   myLongLatData = value;
-            //   setState(() {});
-            //   print(value);
-            // });
-          },
-          tooltip: 'Increment',
-          label: const Text("Search By Name"),
-        ));
+          }
+        },
+      ),
+    );
   }
 }
