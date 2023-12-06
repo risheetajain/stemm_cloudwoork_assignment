@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1012529805143",
+    "project_id": "stemm-assignment",
+    "storage_bucket": "stemm-assignment.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1012529805143:android:ec4c4b1ef2a18578727012",
+        "android_client_info": {
+          "package_name": "com.flutterwings.stemm_cloudwoork_assignment"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDU9H2Y6QhADyxVfF0LzA7Dfv5rJjm8DFw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
