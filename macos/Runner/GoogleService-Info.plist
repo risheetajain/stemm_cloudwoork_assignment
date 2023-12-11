@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>AIzaSyBBPixM3PP4Dhmq25tD6S8KhJc7XTeAKUk</string>
+	<key>GCM_SENDER_ID</key>
+	<string>1012529805143</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.flutterwings.stemmCloudwoorkAssignment.RunnerTests</string>
+	<key>PROJECT_ID</key>
+	<string>stemm-assignment</string>
+	<key>STORAGE_BUCKET</key>
+	<string>stemm-assignment.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:1012529805143:ios:beb45809c98405f5727012</string>
+</dict>
+</plist>
